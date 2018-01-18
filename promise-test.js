@@ -44,15 +44,27 @@ function timerPromisefy(delay) {
 
 const startDate = Date.now()
 
-Promise1.all([
-    timerPromisefy(1),
-    timerPromisefy(32),
-    timerPromisefy(64),
-    timerPromisefy(128)
-]).then(values =>{
-    console.log('all',values);
-    console.log(Date.now() - startDate + 'ms');
-})
+let p11= new Promise(function(resolve,reject){
+    setTimeout(function(){
+        reject('p1失败');
+    },1000);
+});
+let p22 = new Promise(function(resolve,reject){
+    setTimeout(function(){
+        resolve(200);
+    },2000);
+});
+
+console.time('cost');
+console.time('cost2');
+
+Promise.all([p11,p22]).then(function(data){
+    console.log(data);//[1,2]
+    console.timeEnd('cost');
+},function(err){
+    console.log(err);
+    console.timeEnd('cost');
+});
 
 /*resolve*/
 var t2 = Promise1.resolve(1)

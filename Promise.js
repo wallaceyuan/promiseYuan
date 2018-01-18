@@ -105,21 +105,23 @@ Promise.prototype.then = function (onFulfilled, onReject) {
     }
     return promise2;
 }
+function gen(len,cb) {
+    let result = [],count = 0
+    return function (i,data) {
+        result[i] = data
+        if(++count==len){
+            cb(result)
+        }
+    }
+}
 
-Promise.all = function (arr) {
-    return new Promise((resolve,reject) =>{
-        let values = []
-        let len = arr.length
-        for(var i = 0;i < len; i++){
-            let promise = arr[i]
-            if(typeof promise.then == 'function'){
-                promise.then(res=>{
-                    values.push(res)
-                    if(values.length == len){
-                        resolve(values)
-                    }
-                })
-            }
+Promise.all = function (promises) {
+    return new Promise(function(resolve,reject){
+        let done = gen(promises.length,resolve)
+        for(var i = 0;i < promises.length; i++){
+            promises[i].then(function(data){
+                done(i,data)
+            },reject)
         }
     })
 }
